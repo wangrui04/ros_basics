@@ -16,20 +16,20 @@ int current_goal_index = 0;
 const double goal_tolerance = 0.1; // Tolerance for reaching the goal   
 
 void viconCallback(const geometry_msgs::TransformStamped::ConstPtr& msg){
-    """
-    Callback function to update the robot's position and orientation based on Vicon data.
-    It extracts the robot's x, y coordinates and orientation (theta) from the TransformStamped message.
-    """
+
+    //Callback function to update the robot's position and orientation based on Vicon data.
+    //It extracts the robot's x, y coordinates and orientation (theta) from the TransformStamped message.
+   
     robot_x = msg->transform.translation.x;
     robot_y = msg->transform.translation.y;
     robot_theta = tf::getYaw(msg->transform.rotation);
 }
 
 void resetGoal(){
-    """
-    This function resets the goal position to the next corner of a square path.
-    It cycles through the predefined square goals stored in the vector.
-    """
+    
+    //This function resets the goal position to the next corner of a square path.
+    //It cycles through the predefined square goals stored in the vector.
+    
     double start_x = robot_x;
     double start_y = robot_y;
 
@@ -40,10 +40,10 @@ void resetGoal(){
 }
 
 void controlInput(){ //convert to velocity cmd to drive the robot
-    """
-    This function calculates the linear and angular velocity commands for the robot to move towards the goal position.
-    It computes the distance to the goal and the required angular adjustment based on the robot's current position and orientation.
-    """
+    
+    //This function calculates the linear and angular velocity commands for the robot to move towards the goal position.
+    //It computes the distance to the goal and the required angular adjustment based on the robot's current position and orientation.
+    
     double velocity = 0.5*(sqrt(pow((goal_x-robot_x), 2) + pow((goal_y-robot_y), 2)));
     double theta_d = atan2((goal_y-robot_y),(goal_x-robot_x));
     double t = (theta_d - robot_theta); 
@@ -54,19 +54,19 @@ void controlInput(){ //convert to velocity cmd to drive the robot
 }
 
 bool goal_reached(double goal_x, double goal_y){
-    """
-    This function checks if the robot has reached the current goal position within a specified tolerance.
-    It returns true if the distance to the goal is less than or equal to the goal tolerance.
-    """
+    
+    //This function checks if the robot has reached the current goal position within a specified tolerance.
+    //It returns true if the distance to the goal is less than or equal to the goal tolerance.
+    
     double distance = sqrt(pow((goal_x - robot_x), 2) + pow((goal_y - robot_y), 2));
     return distance <= goal_tolerance;
 }
 
 int main(int argc, char** argv){
-    """
-    Main function to initialize the ROS node, set up publishers and subscribers, and control the robot's movement.
-    It continuously checks the robot's position and publishes velocity commands to move towards the goal.
-    """
+    
+    //Main function to initialize the ROS node, set up publishers and subscribers, and control the robot's movement.
+    //It continuously checks the robot's position and publishes velocity commands to move towards the goal.
+    
     // Initialize the ROS node
     // Set up the node handle, publisher, and subscriber
     ros::init(argc, argv, "rosbot_square");

@@ -26,7 +26,7 @@ void viconCallback(const geometry_msgs::TransformStamped::ConstPtr& msg){
     robot_theta = tf::getYaw(msg->transform.rotation);
 }
 
-void getCircularPursuitPoint(double& x, double& y, double t) {
+void getCircularPursuitPoint(double& desired_x, double& desired_y, double t) {
     // """
     // This function calculates the desired point on the circular path based on the time t.
     // It uses the center coordinates, radius, and angular velocity to compute the x and y coordinates.
@@ -35,9 +35,10 @@ void getCircularPursuitPoint(double& x, double& y, double t) {
     desired_y = circle_y + radius * sin(angular_velocity * t);
 }
 
-void controlInput() {
+void controlInput(double& desired_x, double& desired_y) {
     double error = hypot(desired_x - robot_x, desired_y - robot_y) - desired_distance; // Distance from the center to the desired point
-    double theta_d = atan2((desired_y-robot_y),(desired_x_x-robot_x));// Desired angle to the point
+    double velocity = 0.5*(sqrt(pow((desired_x-robot_x), 2) + pow((desired_y-robot_y), 2)));
+    double theta_d = atan2((desired_y-robot_y),(desired_x-robot_x));// Desired angle to the point
     double t = (theta_d - robot_theta); 
     double gamma = 2*(atan2(sin(t), cos(t)));
 
@@ -69,7 +70,7 @@ int main(int argc, char** argv){
     while(ros::ok()){
         ros::spinOnce();
         loop_rate.sleep();
-        controlInput();
+       // controlInput();
         pos_pub.publish(vel);
 
         ROS_INFO("x-coordinate: %f", robot_x);

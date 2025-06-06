@@ -27,6 +27,7 @@ void viconCallback(const geometry_msgs::TransformStamped::ConstPtr& msg){
     // Callback function to update the robot's position and orientation based on Vicon data.
     // It extracts the robot's x, y coordinates and orientation (theta) from the TransformStamped message.
     // """
+    ROS_INFO("[INFO] viconCallback called");
     robot_x = msg->transform.translation.x;
     robot_y = msg->transform.translation.y;
     robot_theta = tf::getYaw(msg->transform.rotation);

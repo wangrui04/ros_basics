@@ -33,9 +33,9 @@ void resetGoal(){
     double start_x = robot_x;
     double start_y = robot_y;
 
-    square_goals.push_back({start_x + 1.0, start_y}); // Move right
-    square_goals.push_back({start_x + 1.0, start_y + 1.0}); // Move up  
-    square_goals.push_back({start_x, start_y + 1.0}); // Move left
+    square_goals.push_back({start_x + 1.5, start_y}); // Move right
+    square_goals.push_back({start_x + 1.5, start_y + 1.5}); // Move up  
+    square_goals.push_back({start_x, start_y + 1.5}); // Move left
     square_goals.push_back({start_x, start_y}); // Move down
 }
 
@@ -44,10 +44,10 @@ void controlInput(){ //convert to velocity cmd to drive the robot
     //This function calculates the linear and angular velocity commands for the robot to move towards the goal position.
     //It computes the distance to the goal and the required angular adjustment based on the robot's current position and orientation.
     
-    double velocity = 0.5*(sqrt(pow((goal_x-robot_x), 2) + pow((goal_y-robot_y), 2)));
+    double velocity = 0.3*(sqrt(pow((goal_x-robot_x), 2) + pow((goal_y-robot_y), 2)));
     double theta_d = atan2((goal_y-robot_y),(goal_x-robot_x));
     double t = (theta_d - robot_theta); 
-    double gamma = 2*(atan2(sin(t), cos(t)));
+    double gamma = 3*(atan2(sin(t), cos(t)));
 
     vel.linear.x = velocity;
     vel.angular.z = gamma;
@@ -83,13 +83,22 @@ int main(int argc, char** argv){
     // goal_x = 0.5;
     // goal_y = 1.5; 
 
+    resetGoal();
+
+    goal_x = square_goals[current_goal_index].first;
+    goal_y = square_goals[current_goal_index].second;
+
     while(ros::ok()){
         ros::spinOnce();
         loop_rate.sleep();
-        resetGoal(); // Reset the goal position every iteration
+//        resetGoal(); // Reset the goal position every iteration
+//	goal_x = square_goals[0].first;
+//	goal_y = square_goals[0].second;
         if(goal_reached(goal_x,goal_y)){
-            ROS_INFO("Reached goal %d: (%f, %f)", current_goal_index, goal_x, goal_y);
-            current_goal_index = (current_goal_index + 1) % square_goals.size();
+           ROS_INFO("Reached goal %d: (%f, %f)", current_goal_index, goal_x, goal_y);
+           current_goal_index = (current_goal_index + 1) % square_goals.size();
+	   goal_x = square_goals[current_goal_index].first;
+	   goal_y = square_goals[current_goal_index].second;
         }
         controlInput();
         pos_pub.publish(vel);
@@ -97,6 +106,8 @@ int main(int argc, char** argv){
         ROS_INFO("x-coordinate: %f", robot_x);
         ROS_INFO("y-coordinate: %f", robot_y);
         ROS_INFO("theta: %f", robot_theta);
+
+	loop_rate.sleep();
     }
     return 0;
 }

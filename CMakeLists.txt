@@ -109,10 +109,7 @@ catkin_package(
 #  CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs
 #  DEPENDS system_lib
 )
-catkin_install_python(PROGRAMS
-  src/send_request.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+
 
 ###########
 ## Build ##

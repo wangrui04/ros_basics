@@ -218,3 +218,6 @@ target_link_libraries(rosbot_square ${catkin_LIBRARIES})
 
 add_executable(rosbot_circle src/rosbot_circle.cpp)
 target_link_libraries(rosbot_circle ${catkin_LIBRARIES})
+
+add_executable(lidar_subscriber src/subscribe_lidar_data.cpp)
+target_link_libraries(lidar_subscriber ${catkin_LIBRARIES})

@@ -219,5 +219,11 @@ target_link_libraries(rosbot_square ${catkin_LIBRARIES})
 add_executable(rosbot_circle src/rosbot_circle.cpp)
 target_link_libraries(rosbot_circle ${catkin_LIBRARIES})
 
-add_executable(lidar_subscriber src/subscribe_lidar_data.cpp)
+add_executable(lidar_subscriber src/lidar_subscriber.cpp)
 target_link_libraries(lidar_subscriber ${catkin_LIBRARIES})
+
+add_executable(obstacle_detector src/obstacle_detector.cpp)
+target_link_libraries(obstacle_detector ${catkin_LIBRARIES})
+
+add_executable(move_obstacle src/move_obstacle.cpp)
+target_link_libraries(move_obstacle ${catkin_LIBRARIES})

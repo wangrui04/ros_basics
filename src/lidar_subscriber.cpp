@@ -12,13 +12,14 @@ void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
     }
 }
 
+
 int main(int argc, char** argv) {
     // Initialize the ROS node
     ros::init(argc, argv, "subscribe_lidar_data");
     ros::NodeHandle nh;
 
     // Subscribe to the LiDAR data topic
-    ros::Subscriber lidar_sub = nh.subscribe("scan", 10, lidarCallback);
+    ros::Subscriber lidar_sub = nh.subscribe("/ROSBOT2/scan", 10, lidarCallback);
 
     // Spin to keep the node running and processing callbacks
     ros::spin();

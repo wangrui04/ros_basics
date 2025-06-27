@@ -29,7 +29,7 @@ Code used for introductory practices to ROS
 * **Note:** unable to detect obstacles from the back because of robot structure blocking lidar. 
 
 
-*** ### *Running commands on ubuntu*
+### *Running commands on ubuntu*
 *ssh into the robot*
 *launch the vicon bridge: roslaunch vicon_bridge vicon.launch*
 *launch the file that is governing the robot movement e.g. 'rosrun rosbot_amr rosbot_travel'*

@@ -2,21 +2,22 @@
 #include "sensor_msgs/LaserScan.h"
 #include "geometry_msgs/Twist.h"
 #include <algorithm>
+#include <limits>
 
 ros::Publisher cmd_vel_pub;
 
 void maintainDist(const sensor_msgs::LaserScan::ConstPtr& msg) {
     ROS_INFO("Initialising...");
     int range_offset = 25;
-    float threshold = 2.0; // Threshold distance to detect obstacles
+    float threshold = 3.0; // Threshold distance to detect obstacles
     float desired_distance = 0.5; // Desired distance from obstacles
     float stop_threshold = 0.05; // Threshold to stop the robot if within this distance of an obstacle
 
     float linear_speed = 0.0; // Linear speed of the robot
     float max_linear_speed = 0.2; // Maximum linear speed
     
-    int min_front_distance = msg->range_min; // Minimum distance the LiDAR can measure
-    int min_back_distance = msg->range_min; // Minimum distance the LiDAR can measure behind
+    float min_front_distance = std::numeric_limits<float>::max();
+    float min_back_distance = std::numeric_limits<float>::max();
     
     int num_ranges = msg->ranges.size();
     int back_center = num_ranges / 2; // Center index for back scanning
@@ -62,34 +63,46 @@ void maintainDist(const sensor_msgs::LaserScan::ConstPtr& msg) {
     geometry_msgs::Twist cmd_vel_msg;
     float diff = 0.0; // Difference between desired and actual distance
 
-    if (min_front_distance < desired_distance - stop_threshold) {
+    // If no valid obstacle readings are detected
+    if (min_front_distance >= threshold) {
+        ROS_WARN("No obstacles detected. Stopping the robot.");
+        linear_speed = 0.0;  // Let the rest of the logic publish a stop
+    }
+    else if (min_front_distance < desired_distance - stop_threshold) {
         diff = min_front_distance - desired_distance;
         linear_speed = Kp * diff;  // Move backward (diff is negative)
         ROS_WARN("Too close to front obstacle, moving back...");
+        ROS_INFO("Distance from obstacle: %f", min_front_distance);
     }
-    else if (min_front_distance > desired_distance + stop_threshold &&
-             min_back_distance > desired_distance - stop_threshold) {
+    else if (min_front_distance > desired_distance + stop_threshold) {
         diff = min_front_distance - desired_distance;
         linear_speed = Kp * diff;  // Move forward
         ROS_INFO("Too far from front obstacle, moving forward...");
+        ROS_INFO("Distance from obstacle: %f", min_front_distance);
     }
-    else if (min_back_distance < desired_distance - stop_threshold) {
-        diff = desired_distance - min_back_distance;
-        linear_speed = -Kp * diff;  // Move forward
-        ROS_WARN("Too close to back obstacle, moving forward...");
-    }
-    else if (min_back_distance > desired_distance + stop_threshold &&
-             min_front_distance > desired_distance - stop_threshold) {
-        diff = desired_distance - min_back_distance;
-        linear_speed = -Kp * diff;  // Move backward
-        ROS_INFO("Too far from back obstacle, moving back...");
-    }
+    // else if (min_back_distance < desired_distance - stop_threshold) {
+    //     diff = desired_distance - min_back_distance;
+    //     linear_speed = Kp * diff;  // Move forward
+    //     ROS_WARN("Too close to back obstacle, moving forward...");
+    //     ROS_INFO("Distance from obstacle: %f", min_back_distance);
+    // }
+    // else if (min_back_distance > desired_distance + stop_threshold) {
+    //     diff = desired_distance - min_back_distance;
+    //     linear_speed = Kp * diff;  // Move backward
+    //     ROS_INFO("Too far from back obstacle, moving back...");
+    //     ROS_INFO("Distance from obstacle: %f", min_back_distance);
+    // }
     else {
+        linear_speed = 0.0;
         ROS_INFO("Within desired distance range. Stopping.");
     }
 
     linear_speed = std::clamp(linear_speed, -max_linear_speed, max_linear_speed); // Clamp the speed to the maximum limits
     // Limit the linear speed to the maximum allowed speed
+
+    // if (linear_speed > max_linear_speed) linear_speed = max_linear_speed;
+    // else if (linear_speed < -max_linear_speed) linear_speed = -max_linear_speed;
+
 
     if (std::abs(diff) < stop_threshold) {
         linear_speed = 0.0; // Stop if within the threshold

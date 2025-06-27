@@ -46,7 +46,7 @@ void obstacleDetector(const sensor_msgs::LaserScan::ConstPtr& msg){
 
 int main(int argc, char** argv) {
     // Initialize the ROS node
-    ros::init(argc, argv, "subscribe_lidar_data");
+    ros::init(argc, argv, "obstacle_detector_node");
     ros::NodeHandle nh;
     
     // Subscribe to obstacle detector
